@@ -1,0 +1,489 @@
+\documentclass{article}
+
+%Russian-specific packages
+%--------------------------------------
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+%--------------------------------------
+
+\usepackage{amsfonts,xr,graphicx,amsmath,amssymb}
+\usepackage{algorithm}
+\usepackage[noend]{algpseudocode} 
+\newcounter{algsubstate}
+\renewcommand{\thealgsubstate}{\alph{algsubstate}}
+\newenvironment{algsubstates}
+{\setcounter{algsubstate}{0}%
+	\renewcommand{\State}{%
+		\stepcounter{algsubstate}%
+		\Statex {\footnotesize\thealgsubstate:}\space}}
+{}
+\newcommand{\Break}{\State \textbf{break} }
+
+\def\C{\mathbb{C}}
+\def\S{\mathbb{S}}
+\def\Z{\mathbb{Z}}
+\def\R{\mathbb{R}}
+\def\F{\mathbb{F}}
+\def\N{\mathbb{N}}
+\def\H{\mathbb{H}}
+\def\T{\mathbb{T}}
+\def\Dg{\mathfrak{D}}
+\def\dg{\mathfrak{d}}
+\def\tilde{\widetilde}
+\def\epsilon{\varepsilon}
+\def\phi{\varphi}
+\def\n{\hfill\break} \def\al{\alpha} \def\be{\beta} \def\ga{\gamma} \def\Ga{\Gamma} \def\ro{\rho}\def\de{\delta} \def\si{\sigma}
+\def\om{\omega} \def\Om{\Omega} \def\ka{\kappa} \def\la{\lambda} \def\La{\Lambda}
+\def\de{\delta} \def\De{\Delta} \def\vph{\varphi} \def\vep{\varepsilon} \def\th{\theta}
+\def\Th{\Theta} \def\vth{\vartheta} \def\sg{\sigma} \def\Sg{\Sigma}\def\ups{\upsilon}\def\ups{\upsilon}
+\def\bendproof{$\hfill \blacksquare$} \def\wendproof{$\hfill \square$}
+\def\holim{\mathop{\rm holim}} \def\span{{\rm span}} \def\mod{{\rm mod}}
+\def\rank{{\rm rank}} \def\bsl{{\backslash}}
+\def\il{\int\limits} \def\pt{{\partial}} \def\lra{{\longrightarrow}}
+\def\noth{\varnothing}
+\def\pa{\partial }
+\def\ra{\rightarrow }
+\def\sm{\setminus }
+\def\ss{\subset }
+\def\ee{\epsilon }
+\def\beq{\begin{equation}}
+\def\eeq{\end{equation}}
+\def\ov{\over}
+\def\ti{\tilde}
+\def\div{\mbox{div}}
+\def\supp{\mbox{supp}}
+\def\tr{\mbox{tr}}
+\def\const{\mbox{const}}
+
+ 
+ 
+
+\newtheorem{theorem}{Теорема}[section]
+\newtheorem{lemma}[theorem]{Лемма}
+\newtheorem{proposition}[theorem]{Предложение}
+\newtheorem{corollary}[theorem]{Следствие}
+\newtheorem{definition}[theorem]{Определение}
+\newtheorem{remark}[theorem]{Замечание}
+\newtheorem{hypothesis}[theorem]{Гипотеза}
+\newtheorem{problem}[theorem]{Проблема}
+\newtheorem{conjecture}[theorem]{Предположение}
+\numberwithin{equation}{section}
+\DeclareMathOperator{\curl }{curl}
+
+\DeclareMathOperator{\diver }{div}
+
+\setcounter{tocdepth}{2}
+
+\begin{document}
+%\title{{ Решётки с экспоненциально большим контактным числом }}
+%\author{ Гладкий Денис }
+\input{TitleList} % Титульный лист
+\tableofcontents % Оглавление
+
+\date{}
+%\maketitle
+
+\def\n{\hfill\break} \def\al{\alpha} \def\be{\beta} \def\ga{\gamma} \def\Ga{\Gamma} \def\ro{\rho}\def\de{\delta} \def\si{\sigma} 
+\def\om{\omega} \def\Om{\Omega} \def\ka{\kappa} \def\la{\lambda} \def\La{\Lambda}
+\def\de{\delta} \def\De{\Delta} \def\vph{\varphi} \def\vep{\varepsilon} \def\th{\theta}
+\def\Th{\Theta} \def\vth{\vartheta} \def\sg{\sigma} \def\Sg{\Sigma}\def\ups{\upsilon}\def\ups{\upsilon}
+\def\bendproof{$\hfill \blacksquare$} \def\wendproof{$\hfill \square$}
+\def\holim{\mathop{\rm holim}} \def\span{{\rm span}} \def\mod{{\rm mod}}
+\def\rank{{\rm rank}} \def\bsl{{\backslash}}
+\def\il{\int\limits} \def\pt{{\partial}} \def\lra{{\longrightarrow}}
+\def\noth{\varnothing}
+\def\pa{\partial } 
+\def\ra{\rightarrow }
+\def\sm{\setminus }
+\def\ss{\subset }
+\def\ee{\epsilon }
+\def\beq{\begin{equation}}
+\def\eeq{\end{equation}}
+\def\ov{\over}
+\def\ti{\tilde}
+\def\div{\mbox{div}}
+\def\supp{\mbox{supp}}
+\def\tr{\mbox{tr}}
+\def\const{\mbox{const}}
+
+\newpage
+
+\section{Введение}
+В данной работе рассматриваются алгоритмы свёрточного кодирования и списочного декодирования, для их построение нам потребуется рассмотреть основные понятия, связанные с кодами, исправляющими ошибки, теорию функциональных полей, а также описание башни Гарсии-Штихтенота. \\
+Основными целями данной работы являются: разбор и реализация алгоритма свёрточного кодирования и алгоритма списочного декодирования на второй ступени башни Гарсии-Штихтенота и приведение конкретного примера работы предложенных алгоритмов.
+\bigskip
+
+
+\section{Предварительные сведения}
+
+\subsection{Коды, исправляющие ошибки}
+Напомним несколько фактов об кодах, исправляющих ошибки; для дополнительной информации, можно обратиться к [MWS], а также [TVN, Ch. 1]. 
+Зафиксируем конечное поле $\F_q.$
+$q$-нарный линейный код - это подпространство $C\subseteq \F_q^n,$  где $n$ называется длиной кода $C,$  а отношение $R= k/n$ для $\,k= \dim\, C$ называется скоростью кода $C$. Минимальное расстояние $d=d(C)$ представляет собой минимальный вес Хэмминга $wt(c)$, т.е. число ненулевых координат, для $c\in C\setminus\{0\}$; отношение $\de= d/n$ называется
+относительным минимальным расстоянием. В этом случае мы говорим, что $C$ является $[n, k, d]_q$-кодом. Выбор базиса в $C$ определяет линейное отображение $\phi_C: \F_q^k\lra\F_q^n$, и его матрица называется
+порождающей или образующей матрицей кода $C$. Набор кодов $C_1\ss \ldots \ss C_m\subseteq \F_q^n $ называется вложенным семейством. Для   $C\subseteq \F_q^n$ его дуальный код $  C^\perp$ является ортогональным дополнением к $C$: 
+$$ C^\perp=\{v\in \F_q^n:   v\cdot c  =0,\,\forall c\in C \}, $$
+где $  v\cdot c =v_1c_1+\ldots+v_nc_n$; $C^\perp$ $[n, n-k, d^\perp]_q$-код для некоторого $d^\perp$.
+
+\smallskip Случайный выбор базиса показывает, что асимптотически при  $n\lra\infty$ и фиксированном $\de$ скорость $R$ лучших линейных кодов удовлетворяет оценке Гильберта-Варшамова
+$$ R=R_q(\de)\ge 1-H_q(\de)=1-\frac{\de\log (q-1)+H(\de)}{\log q}$$
+где $H(\de)=-\de\log \de-(1-\de)\log (1-\de)$ двоичная функция энтропии.
+
+
+\subsection{Функциональные поля}
+
+\begin{definition}\label{function_field}
+	Алгебраическое функциональное поле $ \F/k $ от одной переменной - расширение $ k \subseteq \F: \F $ - конечное алгебраическое расширение $ k(x) $, где $ x \in \F $ - трансцендентный над $ k $ элемент. \\
+	$ \overline{k} = \left\lbrace z \in \F: z - \hbox{алгебраический над } k\right\rbrace  \subset \F  $ - поле констант функционального поля $ \F $, при этом $ k \subseteq \overline{k} \subset \F $. \\
+	Если $ k = \overline{k} $, т.е. $ k $ алгебраически замкнуто в $ \F $, то $ k $ является полным полем констант.
+\end{definition}
+
+\begin{definition}\label{O_ring}
+	Кольцо нормирования функционального поля  $ \F/k $ - подкольцо  $ \mathcal{O} \subset \F $:\\
+	1) $ k \subsetneqq \mathcal{O} \subsetneqq \F $ \\
+	2) $ z \in \F \Rightarrow z \in \mathcal{O} \hbox{ или } z^{-1} \in \mathcal{O} $
+\end{definition}
+
+\begin{definition}\label{place}
+	Точкой  $ P $ функционального поля $ \F/k $ называется максимальный идеал $ P = t \cdot \mathcal{O} $ некоторого кольца нормирования $ \mathcal{O} $, где $ t \in \F $ - локальный параметр точки $ P $. \\
+	$ \mathcal{O}_P $ - кольцо нормирования точки $ P $. \\
+	$ \mathbb{P}_{\F} $ - множество точек функционального поля $ \F $.
+\end{definition}
+
+\begin{definition}\label{divisor}
+	Дивизор функционального поля $ \F/k $ - конечная формальная сумма точек 
+	\[ D = \sum_{P \in \mathbb{P}_{\F} } n_{P}P, \] где почти все $ n_P = 0 $. \\
+	$ Div(\F) $ - группа дивизоров функционального поля $ \F/k $. \\
+	Носитель дивизора: \[ Supp(D) = \left\lbrace P \in \mathbb{P}_{\F}: n_P \neq 0  \right\rbrace  \]
+	Степень дивизора: \[ \deg{D} = \sum_{P}{n_{P}P} \]
+\end{definition}
+
+\begin{definition}\label{main_divisor}
+	Главный дивизор элемента $ f \in \F $ - дивизор
+	\[ (f) = \sum_{P} v_{P}(f) \cdot P ,\]
+	где $ v_{P}(f) $ - дискретное нормирование точки $ P $.
+\end{definition}
+
+\begin{definition}\label{Rimman-Roch_space}
+	Пространство Римана-Роха, ассоциированное с дивизором $ D \in Div(\F) $ - конечномерное векторное пространство
+	\[ L(D) = \left\lbrace x \in \F: (x) \geq -D \right\rbrace \cup \left\lbrace 0 \right\rbrace .\]
+	Размерность пространства Римана-Роха: $ \dim_{k}{L(D)} = l(D) = \dim{D} .$
+\end{definition}
+
+\begin{theorem}\label{Th_Rimman-Roch}
+	Для дивизра $ D \in Div(\F) $ выполняется:
+	\[ l(D) = \deg{D} + 1 - g + i(D), \]
+	где $ g $ - род поля $ \F/k $, $ i(D) $ - индекс специальности.
+\end{theorem}	
+
+
+\subsection{Башня Гарсии-Штихтенота }
+\begin{definition}\label{Garcia_Stichtenoth_tower}
+Башня $ X_n,n=1,2,\ldots$ из [GS1] определяется рекурсивно по уравнениям
+\beq\label{GS_tower_equastions} x^q_{i+1}+x_{i+1}=\frac{x^q_i}{x^{q-1}_i +1},\;\; {\rm для} \;\;i=1,\ldots, n-1.\eeq
+
+Следовательно, функциональное поле $T_n :=\F_{q^2}(X_n)$ кривой $X_n$ определяется как $T_n =\F_{q^2}(x_1, \ldots, x_n)$ где $x_i, i=1,\ldots n$ связаны соотношением  \eqref{GS_tower_equastions}. Основной результат из [GS1] дает параметры этой башни.
+\end{definition}
+
+\begin{theorem}\label{GS_tower_genus} Мы имеем 
+	
+	$ (i)$  для рода $g_n=g(X_n):$ 
+	
+	$$ g_{n}= (q^{m}-1)^2  \;\;\hbox{\rm для } \;\; n=2m ,$$
+	$$ g_{n} = {(q^{m}-1)(q^{m-1}-1)}   \;\;\hbox{\rm для } \;\; k=2m-1,$$
+	и число $N(n)=|X_n(\F_{q^2})|$  $\F_{q^2}$-рациональных точек кривой $X_n$ удовлетворяет
+	$$N(n)\ge (q-1) q^n .$$
+\end{theorem}
+
+\section{Алгоритмы}
+
+\subsection{Алгоритм свёрточного кодирования}
+
+\begin{itemize}
+	\item $ T_e = \F_{r^2}(x_1,...,x_e) $ - ступень башни Гарсии-Штихтенота с номером $ e \geq 2 $;
+	\item $ \F_{r^2} = \F_{r}(\alpha) $, т.е. $ \alpha $ - примитивный корень поля $ \F_{r^2} $;
+	\item $ G = lP_{\infty} $ - дивизор, определяющий кодирующее преобразование;
+	\item $ \sigma \in Aut(T_e/\F_q): \sigma(x_i) = \alpha^{(r+1)r^{i-1}}x_i, 1 \leq i \leq e $ - автоморфизм поля $ T_e. $ Все точки $ Q \in \mathbb{P}_{T_e} $, лежащие над точками $ P_{\alpha} \in \mathbb{P}_{T_1} $, где $ Tr(\alpha) \neq 0 $, полностью расщепляются в башне $ T $. Следовательно, число точек $ \# \left\lbrace Q \in \mathbb{P}_{T_e}, \hbox{ где } Q|P_{\alpha}, Tr(\alpha \neq 0) \right\rbrace = (r-1)r^e $. Автоморфизм $ \sigma $ делит это множество на $ r^e $ орбит, каждая из которых имеет $ r-1 $ точку. Выбрав целое число $ m: 0 \leq m \leq r-1  $, мы можем выбрать $ m \cdot N $ различных расщепляющихся точек $ Q_1, Q_1^{\sigma},...,Q_1^{\sigma^{m-1}},...,Q_N, Q_N^{\sigma},...,Q_N^{\sigma^{m-1}} $, где $ N \leq r^e \cdot \left\lfloor \frac{r-1}{m} \right\rfloor $;
+	\item $ \frac{1}{m} < N < r^e \cdot \left\lfloor \frac{r-1}{m} \right\rfloor $ - число точек кода;
+	\item Кодирующее отображение определяется следующим образом:
+	\[
+		FGS: L(lP_{\infty}) \rightarrow \F_q^N,
+	\]
+	\[
+		f \mapsto 
+		\left(  
+			\left[
+			\begin{array}{cc}
+			f(P_1) \\
+			f(P_1^{\sigma}) \\
+			... \\
+			f(P_1^{\sigma^{m-1}})
+			\end{array}\right],
+						\left[
+			\begin{array}{cc}
+			f(P_2) \\
+			f(P_2^{\sigma}) \\
+			... \\
+			f(P_2^{\sigma^{m-1}})
+			\end{array}\right],
+			...,
+						\left[
+			\begin{array}{cc}
+			f(P_N) \\
+			f(P_N^{\sigma}) \\
+			... \\
+			f(P_N^{\sigma^{m-1}})
+			\end{array}\right]
+		\right) 
+	\]
+	Отобращение $ FGS $ определяет $ \F_q $-линейный код $ FGS(N,l,q,e,m) $ над алфавитом мощности $ q $;
+	\item Длина кода: $ n = Nm $;
+	\item Размерность кода: $ k = \dim(lP_{\infty}) = l+1-g_e $;
+	\item Скорость кода: $ R \geq \frac{k}{n} = \frac{l-g_e+1}{Nm}$;
+	\item Минимальное расстояние кода: $ d \geq N - \frac{l}{m} $;
+	\item Число исправляемых ошибок удовлетворяет неравенству:
+	\[
+		\left\lfloor \frac{d-1}{2} \right\rfloor \leq t \leq N(m-1) + \frac{Ns}{s+1} \cdot \left( 1 - \frac{k}{N(m-s+1)} \right)  - \frac{3g_e}{m-s+1};
+	\]
+	\item Знавчение $ l $ ограничивается следующим неравенством:
+	\[
+		2g_e \leq l \leq mr^e \cdot \left\lfloor \frac{r-1}{2} \right\rfloor ;
+	\]
+\end{itemize}
+
+\begin{algorithm}[H]
+	\caption{Алгоритм кодирования}\label{alg:encode}
+	\begin{algorithmic}[1]
+		\Require $ N,l,r,e=2,m,f. $
+		\Ensure $ \text{Кодовое слово } y \in \F_{r^2}^{mN} $
+		\State $ q \gets r^e = r^2 $. Построить конечное поле $ \F_{r^2} = \F_r(\alpha) $.
+    	\For{$ 0 \leq j \leq r-1  $}
+			\State$ Km[j] \gets \left\lbrace \alpha \in \F_{r^2}: Tr(\alpha) = j \right\rbrace $
+		\EndFor
+		\State Задать $ Q_{0..N-1} $ - пустой массив, в который будут записаны точки кода.
+    	\For{$ \beta \notin Km[0]  $}
+	    	\If {$ len(Q) \geq N $}
+	    		\Break
+			\EndIf
+			\State $ c \gets \frac{2Tr(\beta^{r+1})}{Tr(\beta)} \in \F_r $.
+	    	\For{$ \gamma \in Km[c]  $}
+				\If {$ len(Q) \geq N $}
+					\Break
+				\EndIf
+				\State $ Q[len(Q)] = [\beta, \gamma]$.
+			\EndFor
+		\EndFor
+		\State Задать $ y_{1..m,1..N} $ - пустой двумерный массив.
+    	\For{$ 0 \leq i \leq m-1 $}
+			\For{$ 0 \leq j \leq N-1  $}
+				\State $ y[i][j] \gets f(Q[i][0] \cdot 2^{i-1}, Q[i][1] \cdot 2^{i-1} ) $
+			\EndFor
+		\EndFor
+		\State Return $ y $
+	\end{algorithmic}
+	
+\end{algorithm}
+
+
+\subsection{Алгоритм списочного декодирования}
+
+\begin{itemize}
+	\item $ s \geq 1 $ - константа декодера;
+	\item $ k = \dim(lP_{\infty}) = l+1-g_e $ - размерность кода;
+	\item $ D = \left\lfloor \frac{N(m-s+1)-k+sg_e+1}{s+1} \right\rfloor $ - степенной параметр;
+\end{itemize}
+
+\begin{algorithm}[H]
+	\caption{Алгоритм декодирования}\label{alg:decode}
+	\begin{algorithmic}[1]
+		\Require $ N,l,r,e=2,m,Q_{1..N},y. $
+		\Ensure $ \text{Восстановленное сообщение } f \in L(lP_{\infty}) \text{ или сообщение об ошибке} $.
+		\State $ q \gets r^e = r^2 $. Построить конечное поле $ \F_{r^2} = \F_r(\alpha) $.
+		\State $ s \gets 1 $
+		\State $ k \gets l - 3 $
+		\State $ D = \left\lfloor \frac{N(m-s+1)-k+sg_e+1}{s+1} \right\rfloor = \left\lfloor \frac{N(m-s+1)-k+s(l+1-k)+1}{s+1} \right\rfloor $
+		\State Построить множества $ L1_{0..l-2}, L2_{0..D-2}, L3_{0..D+l-2} $ - базиси соответствующих пространств Римана-Роха $ L(lP_{\infty}), L(DP_{\infty}), L((D+l)P_{\infty}) $.
+		\State \[ A_0 \gets \sum_{i=0}^{D+l-2}{a_0[i] \cdot L3[i] }, \qquad
+		A_1 \gets \sum_{i=0}^{D-2}{a_1[i] \cdot L2[i] } \]
+		\State Составить систему однородных линейных уравнений и найти любое её нетривиальное решение $ \left\lbrace  a_0[0],..,a_0[D+l-2],a_1[0],..,a_1[D-2] \right\rbrace $:
+		\[
+		\begin{cases}
+		A_0(Q[j][0], Q[j][1]) + A_1(Q[j][0], Q[j][1]) \cdot y[0][j] = 0 \\
+		A_0(2Q[j][0], 2Q[j][1]) + A_1(2Q[j][0], 2Q[j][1]) \cdot y[1][j] = 0
+		\end{cases}
+		\]
+		\[ (0 \leq j \leq N)-1 \]
+		\State $ Q \gets A_0 + A_1 \cdot Y $
+		\State Задать \[
+		f = \sum_{i=0}^{l-2}{f[i] \cdot L1[i]}
+		\]
+		\State Составить систему однородных линейных уравнений относительно $ \left\lbrace  f[1],..,f[l-2] \right\rbrace $ и решить её:
+		\[
+		A_0(Q[j][0], Q[j][1]) + A_1(Q[j][0], Q[j][1]) \cdot f(Q[j][0], Q[j][1]) = 0
+		\]
+		\[ (0 \leq j \leq N-1) \]
+		\State Если система несовместна или имеет бесконечно много решений, то корректное декодирование исходного сообщение невозможно.
+		Завершить алгоритм с сообщением об ошибке.
+		\State Return $ f $
+	\end{algorithmic}	
+\end{algorithm}
+Реализацию алгоритмов можно найти на странице [Alg]
+
+
+
+\section{Пример работы алгоритмов}
+
+Зафиксируем параметры кода:
+\begin{itemize}
+	\item $ r = 3 \Rightarrow  \F_{3^2} $ - поле констант башни;
+	\item $ e = 2 \Rightarrow $ код будем строить  на второй ступени башни $ T2 $ ;
+	\item $ g_e = 4 $ - род башни $ T_2 $
+	\item $ l = 8 $ - множитель точки $ P_{\infty} $;
+	\item $ N = 9 $ - количество точек кода;
+	\item $ D = 9 $ - степенной параметр;
+	\item $ m = 2 $ - число вычисляемых автоморфизмов для каждой точки при кодировании;
+	\item $ s = 1 $ - константа декодера;
+	\item Длина кода: $ n = 9 \cdot 2 = 18 $;
+	\item Размерность кода: $ k = 8+1-4 = 5 $;
+	\item Скорость кода: $ R \geq \frac{5}{18} \approx 0.27778 $;
+	\item Минимальное расстояние кода: $ d \geq 18 - \frac{8}{2} = 5 $;
+	\item Число исправляемых ошибок удовлетворяет неравенству:
+	\[
+	 2 \leq t \leq 6;
+	\]
+\end{itemize}
+
+\begin{enumerate}
+\item Базовое поле $ \F_{3^2} = \F_{3}(\alpha) $, где $ \alpha $  - корень неприводимого над $ \F_3 $ многочлена $ x^2 + 2 \cdot x + 2 $. \\
+Мультиптикативная группа базового поля:
+\[ 
+	\F_{3^2}^{*} = \left\lbrace \alpha, \alpha + 1, 2\alpha + 1, 2, 2\alpha, 2\alpha + 2, \alpha + 2, 1 \right\rbrace
+\]
+\item Точки кода:
+\[
+	\left\lbrace [\alpha, 2\alpha], [\alpha, \alpha + 2], [\alpha, 1], [2\alpha + 1, 2\alpha], [2\alpha + 1, \alpha + 2], [2\alpha + 1, 1], [2, \alpha], [2, 2\alpha + 1], [2, 2] \right\rbrace 
+\]
+\item Базиси пространств Римана-Роха: \\
+	$
+	\!
+	\begin{aligned}[t]
+		L(lP_{\infty}) \rightarrow L1 = \{ &x_1^2, x_1, 1, (x_1^2 + 1)*x_2, (x_1^2 + 1)x_2^2 \} \\
+		L(DP_{\infty}) \rightarrow L2 = \{ &x_1^3, x_1^2, x_1, 1, (x_1^2 + 1)x_2, (x_1^2 + 1)x_2^2 \} \\
+		L((D+l)P_{\infty}) \rightarrow L3 = \{ &x_1^5, x_1^4, x_1^3, x_1^2, x_1, 1, (x_1^5 + x_1^3)x_2, (x_1^4 + x_1^2)x_2, (x-1^3 + x_1)x_2, \\
+		(&x_1^2 + 1)x_2, (x_1^5 + x_1^3)x_2^2, (x_1^4 + x_1^2)x_2^2, (x_1^3 + x_1)x_2^2, (x_1^2 + 1)x_2^2 \}
+	\end{aligned} \\
+	$ \\
+	Размерности пространств: $ \dim{L1} = l_1; \quad \dim{L2} = l_2; \quad \dim{L3} = l_3; $
+\item Исходное сообщение: $ f = (1, 2, \alpha, \alpha + 1, \alpha + 2) \in \F_9^{l_1} $ \\
+	Исходное сообщение как элемент $ L(lP_{\infty}): \\ f \mapsto (\alpha - 1)x_1^2 x_2^2 + (\alpha + 1) x_1^2 x_2 + x_1^2 + (\alpha - 1) x_2^2 - x_1 + (\alpha + 1) x_2 + \alpha $
+\item Кодовое слово:
+\[
+	y =
+	\begin{pmatrix}
+		\begin{matrix} 
+			1 & \alpha + 1 & \alpha & 2 & \alpha + 1 & 2\alpha + 2 & \alpha + 1 & 2 & \alpha + 1 \\
+			\alpha & 2 & \alpha & \alpha & \alpha + 2 & \alpha & 2\alpha + 1 & \alpha & 2\alpha
+		\end{matrix}
+	\end{pmatrix}
+\]
+	Внесём 2 ошибки: $ f[0][0] = 0; \quad f[1][1] = \alpha + 2 $ \\
+	Кодовое слово с ошибками:
+	\[
+		y^{'} =
+		\begin{pmatrix}
+			\begin{matrix} 
+				0 & \alpha + 1 & \alpha & 2 & \alpha + 1 & 2\alpha + 2 & \alpha + 1 & 2 & \alpha + 1 \\
+				\alpha & \alpha + 2 & \alpha & \alpha & \alpha + 2 & \alpha & 2\alpha + 1 & \alpha & 2\alpha
+			\end{matrix}
+		\end{pmatrix}
+	\]
+\item Для декодирования построим вспомогательный многочлен \\
+$ Q(Y) = A_0 + A_1 Y $. \\
+\[ A_0 = \sum_{i=0}^{l_3-1}{a_0[i] \cdot L3[i] }, \qquad
+A_1 = \sum_{i=0}^{l_2-1}{a_1[i] \cdot L2[i] } \]
+Матрица системы однородных линейных уравнений для нахождения коэффициентов $ \left\lbrace a_0[0],..,a_0[l_3-1],a_1[0],..,a_1[l_2-1] \right\rbrace $ выглядит следующим образом:
+\[
+\begin{pmatrix}
+	\begin{smallmatrix} 
+		2\alpha & 2 & 2\alpha + 1 & \alpha + 1 & \alpha & 1 & \alpha + 2 & 2\alpha + 2 & 2\alpha & 2 & 2 & 2\alpha + 1 & \alpha + 1 & \alpha & 0 & 0 & 0 & 0 & 0 & 0 & \vline & 0 \\
+		\alpha & 2 & \alpha + 2 & \alpha + 1 & 2\alpha & 1 & \alpha + 2 & \alpha + 1 & 2\alpha & 1 & 1 & 2\alpha + 1 & 2\alpha + 2 & \alpha & 1 & 2\alpha + 1 & 2\alpha + 2 & \alpha & \alpha & \alpha + 1 & \vline & 0 \\
+		2\alpha & 2 & 2\alpha + 1 & \alpha + 1 & \alpha & 1 & \alpha & 1 & \alpha + 2 & 2\alpha + 2 & 1 & \alpha + 2 & 2\alpha + 2 & 2\alpha & 2\alpha & 2 & 2\alpha + 1 & \alpha + 1 & 1 & \alpha + 2 & \vline & 0 \\
+		\alpha & 2 & \alpha + 2 & \alpha + 1 & 2\alpha & 1 & \alpha & 2 & \alpha + 2 & \alpha + 1 & 2 & \alpha + 2 & \alpha + 1 & 2\alpha & 2\alpha + 2 & \alpha & 2 & \alpha + 2 & \alpha & 2 & \vline & 0 \\
+		2\alpha & 2 & 2\alpha + 1 & \alpha + 1 & \alpha & 1 & \alpha + 1 & \alpha & 1 & \alpha + 2 & \alpha + 1 & \alpha & 1 & \alpha + 2 & 2 & 2\alpha + 1 & \alpha + 1 & \alpha & 1 & 1 & \vline & 0 \\
+		\alpha & 2 & \alpha + 2 & \alpha + 1 & 2\alpha & 1 & \alpha + 1 & 2\alpha & 1 & 2\alpha + 1 & 2\alpha + 2 & \alpha & 2 & \alpha + 2 & 1 & 2\alpha + 1 & 2\alpha + 2 & \alpha & 2 & 1 & \vline & 0 \\
+		\alpha + 2 & 2 & \alpha & 2\alpha + 2 & 2\alpha + 1 & 1 & 2\alpha + 1 & 1 & 2\alpha & \alpha + 1 & 1 & 2\alpha & \alpha + 1 & \alpha + 2 & 2\alpha & \alpha + 1 & \alpha + 2 & 2 & 2\alpha + 2 & 2\alpha + 1 & \vline & 0 \\
+		2\alpha + 1 & 2 & 2\alpha & 2\alpha + 2 & \alpha + 2 & 1 & 2\alpha + 1 & 2 & 2\alpha & 2\alpha + 2 & 2 & 2\alpha & 2\alpha + 2 & \alpha + 2 & 2\alpha + 2 & \alpha + 2 & 1 & \alpha & \alpha + 2 & 1 & \vline & 0 \\
+		\alpha + 2 & 2 & \alpha & 2\alpha + 2 & 2\alpha + 1 & 1 & 2\alpha & \alpha + 1 & \alpha + 2 & 2 & 2 & \alpha & 2\alpha + 2 & 2\alpha + 1 & 2\alpha + 1 & 1 & 2\alpha & \alpha + 1 & 2\alpha + 2 & 2\alpha & \vline & 0 \\
+		2\alpha + 1 & 2 & 2\alpha & 2\alpha + 2 & \alpha + 2 & 1 & 2\alpha & 2\alpha + 2 & \alpha + 2 & 1 & 1 & \alpha & \alpha + 1 & 2\alpha + 1 & 2 & 2\alpha & 2\alpha + 2 & \alpha + 2 & \alpha + 2 & \alpha + 1 & \vline & 0 \\
+		\alpha + 2 & 2 & \alpha & 2\alpha + 2 & 2\alpha + 1 & 1 & 2\alpha + 2 & 2\alpha + 1 & 1 & 2\alpha & 2\alpha + 2 & 2\alpha + 1 & 1 & 2\alpha & \alpha + 2 & 2 & \alpha & 2\alpha + 2 & 2\alpha + 1 & 2\alpha + 1 & \vline & 0 \\
+		2\alpha + 1 & 2 & 2\alpha & 2\alpha + 2 & \alpha + 2 & 1 & 2\alpha + 2 & \alpha + 2 & 1 & \alpha & \alpha + 1 & 2\alpha + 1 & 2 & 2\alpha & 2\alpha + 2 & \alpha + 2 & 1 & \alpha & \alpha + 1 & 2\alpha + 2 & \vline & 0 \\
+		2 & 1 & 2 & 1 & 2 & 1 & \alpha & 2\alpha & \alpha & 2\alpha & \alpha + 1 & 2\alpha + 2 & \alpha + 1 & 2\alpha + 2 & 2\alpha + 2 & \alpha + 1 & 2\alpha + 2 & \alpha + 1 & \alpha + 2 & 1 & \vline & 0 \\
+		1 & 1 & 1 & 1 & 1 & 1 & \alpha & \alpha & \alpha & \alpha & 2\alpha + 2 & 2\alpha + 2 & 2\alpha + 2 & 2\alpha + 2 & 2\alpha + 1 & 2\alpha + 1 & 2\alpha + 1 & 2\alpha + 1 & 2 & \alpha & \vline & 0 \\
+		2 & 1 & 2 & 1 & 2 & 1 & 2\alpha + 1 & \alpha + 2 & 2\alpha + 1 & \alpha + 2 & 2\alpha + 2 & \alpha + 1 & 2\alpha + 2 & \alpha + 1 & 1 & 2 & 1 & 2 & 2\alpha + 1 & 2\alpha + 2 & \vline & 0 \\
+		1 & 1 & 1 & 1 & 1 & 1 & 2\alpha + 1 & 2\alpha + 1 & 2\alpha + 1 & 2\alpha + 1 & \alpha + 1 & \alpha + 1 & \alpha + 1 & \alpha + 1 & \alpha & \alpha & \alpha & \alpha & 2 & 2\alpha + 1 & \vline & 0 \\
+		2 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 2 & 1 & 1 & 2 & 1 & 2 & 2\alpha + 2 & \alpha + 1 & 2\alpha + 2 & \alpha + 1 & \alpha + 1 & 2\alpha + 2 & \vline & 0 \\
+		1 & 1 & 1 & 1 & 1 & 1 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2 & 2\alpha & 2\alpha & 2\alpha & 2\alpha & \alpha & \alpha & \vline & 0 \\
+	\end{smallmatrix}
+\end{pmatrix}
+\]
+Частным решением системы является вектор: \\
+\[ 
+	\left( 1, 0, 0, 0, 2\alpha + 1, 2\alpha, \alpha + 1, 2\alpha, 1, 2\alpha, 0, 0, 0, 2, 0, 0, 1, 1, \alpha + 2, \alpha + 2 \right)
+\]
+	$
+\!
+\begin{aligned}[t]
+	&A_0 = (2x_1^2 + 2) x_2^2 + ((\alpha + 1) x_1^5 + 2\alpha x_1^4 + (\alpha + 2 )x_1^3 + \alpha x_1^2 + x_1 + 2\alpha) x_2 + x_1^5 + (2\alpha + 1) x_1 + 2\alpha \\
+	&A_1 = ((\alpha + 2) x_1^2 + \alpha + 2) x_2^2 + ((\alpha + 2) x_1^2 + \alpha + 2) x_2 + x_1 + 1 \\
+	&Q = A_0 + A_1 \cdot Y = (((\alpha + 2) x_1^2 + \alpha + 2) x_2^2 + ((\alpha + 2) x_1^2 + \alpha + 2) x_2 + x_1 + 1) Y + \\
+	&+ (2 x_1^2 + 2) x_2^2 + ((\alpha + 1) x_1^5 + 2\alpha x_1^4 + (\alpha + 2) x_1^3 + \alpha x_1^2 + x_1 + 2 \alpha) x_2 + x_1^5 + (2\alpha + 1) x_1 + 2\alpha
+\end{aligned} \\
+$ \\
+\item Для восстановления исходного сообщения зададим
+\[
+f = \sum_{i=0}^{l_1-1}{f[i] \cdot L1[i]}
+\]
+Матрица системы однородных линейных уравнений для нахождения коэффициентов $ \left\lbrace f[0],..,f[l_1-1] \right\rbrace $ имеет следующий вид:
+\[
+\begin{pmatrix}
+	\begin{matrix}
+		0 & 0 & 0 & 0 & 0 & \vline & 0 \\
+		0 & 0 & 0 & 0 & 0 & \vline & 0 \\
+		1 & \alpha + 2 & 2\alpha + 2 & 2\alpha & 2\alpha & \vline & \alpha + 2 \\
+		\alpha & 2\alpha + 2 & 2\alpha + 1 & 2\alpha & \alpha + 1 & \vline & \alpha + 2 \\
+		\alpha & 2\alpha + 2 & 2\alpha + 1 & \alpha + 2 & 2\alpha + 2 & \vline & 2\alpha \\
+		2\alpha + 1 & 1 & 2\alpha & \alpha + 1 & \alpha + 1 & \vline & 2\alpha + 1 \\
+		2\alpha + 2 & \alpha + 1 & 2\alpha + 2 & 2\alpha + 1 & 2 & \vline & 1 \\
+		2 & 1 & 2 & 2\alpha + 1 & 2\alpha + 2 & \vline & 1 \\
+		0 & 0 & 0 & 0 & 0 & \vline & 0 \\
+	\end{matrix}
+\end{pmatrix}
+\]
+Единственное решение системы:
+\[ 
+\left( 1, 2, \alpha, \alpha + 1, \alpha + 2 \right)
+\]
+Данное решение совпадает с исходным сообщением, таким образом, процедура декодирования завершена успешно.
+\end{enumerate}
+
+
+\newpage
+\section { Заключение }
+В ходе работы были изучены основные понятия, связанные с кодами, исправляющими ошибки, теория функциональных полей, башни Гарсии-Штихтенота. Реализованы алгоритм свёрточного кодирования и алгоритм списочного декодирования на второй ступени башни Гарсии-Штихтенота, и приведён конкретный пример работы алгоритмов.
+
+\newpage
+
+\section { Список используемой литературы }
+
+\bigskip \noindent [Vla] Serge Vlăduţ, {\em Lattices with exponentially large kissing numbers }, 2018.
+
+\medskip\noindent [Sti] Stichtenoth H. {\em Algebraic function fields and codes }, 2009.
+
+\medskip\noindent [GX] Guruswami V, Xing C. {\em Optimal rate list decoding over bounded alphabets using
+algebraic-geometry codes }, 2017.
+
+\medskip\noindent [Alg] https://github.com/DenisAmberCode/CourseWork5.git
+
+
+\end{document}  
